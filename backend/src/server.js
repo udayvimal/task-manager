@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
@@ -18,9 +19,9 @@ app.use('/api/dashboard', require('./routes/dashboard'));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
-// Serve React build in production
-if (process.env.NODE_ENV === 'production') {
-  const publicDir = path.join(__dirname, '../public');
+// Serve React build if frontend has been built
+const publicDir = path.join(__dirname, '../public');
+if (fs.existsSync(path.join(publicDir, 'index.html'))) {
   app.use(express.static(publicDir));
   app.get('*', (_req, res) => {
     res.sendFile(path.join(publicDir, 'index.html'));
