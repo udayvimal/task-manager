@@ -1,124 +1,279 @@
-# TaskFlow — Team Task Management Application
+# TaskFlow — Production-Grade Collaborative Task Management Platform
 
-> A production-grade, full-stack collaborative task management platform built with Node.js, React, and PostgreSQL. Manage projects, assign tasks, track progress, and collaborate with your team — all in one place.
+> Full-Stack · Node.js + React + PostgreSQL · JWT Auth · Role-Based Access Control · Live Deployed on Railway
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://your-app.railway.app)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/yourusername/taskflow)
+[![Live Demo](https://img.shields.io/badge/LIVE%20DEMO-Click%20Here-brightgreen?style=for-the-badge&logo=railway)](https://task-manager-production-0aaa.up.railway.app/login)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js)](https://nodejs.org)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)](https://react.dev)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-4169E1?style=for-the-badge&logo=postgresql)](https://supabase.com)
+[![Prisma](https://img.shields.io/badge/ORM-Prisma-2D3748?style=for-the-badge&logo=prisma)](https://prisma.io)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 ---
 
-## 📸 Screenshots
+## What Is This?
 
-> **Note:** Replace the placeholder links below with your actual deployed screenshots.
+TaskFlow is a **production-ready, multi-user team task management platform** built from scratch — no boilerplate generators, no starter kits. It lets teams create projects, assign tasks, manage members, and track progress through a Kanban board and analytics dashboard.
 
-| Dashboard | Project Board | API Docs |
-|-----------|--------------|----------|
-| ![Dashboard](docs/screenshots/dashboard.png) | ![Board](docs/screenshots/board.png) | ![Docs](docs/screenshots/docs.png) |
-
----
-
-## 🎥 Demo Video
-
-> **[▶ Watch the 4-minute walkthrough on Loom / YouTube](https://your-video-link-here)**
-> 
-> The demo covers: signup, creating a project, adding team members, creating & assigning tasks, updating task status as a member, and the live dashboard analytics.
+**What makes it production-grade:**
+- Role-based access control enforced **on the server** (not just hidden in the UI)
+- Single-service Railway deployment — one URL, zero CORS issues
+- Prisma-managed schema with cascade deletes for data integrity
+- JWT authentication with bcrypt-hashed passwords
+- Axios interceptors for centralized 401 handling
 
 ---
 
-## ✨ Features
+## Screenshots — Proof It Works
 
-### Core Functionality
-- **JWT Authentication** — Secure signup/login with bcrypt-hashed passwords and 7-day tokens
-- **Project Management** — Create projects; creator automatically becomes Admin; invite members by email
-- **Kanban Task Board** — Visual To Do / In Progress / Done columns per project
-- **Role-Based Access Control (RBAC)**
-  - **Admin**: Full CRUD on tasks, members, and the project itself
-  - **Member**: Can view assigned tasks and update their status only
-- **Real-time Dashboard** — Aggregated stats: total tasks, tasks by status, tasks by priority, tasks per user, overdue tasks
-- **Overdue Detection** — Tasks past their due date are visually flagged
-- **Priority Levels** — Low / Medium / High with color-coded badges
-- **API Documentation** — In-app interactive `/docs` page with all endpoints
-- **Health Check** — `/api/health` endpoint for uptime monitoring
+### Dashboard — Real-Time Analytics
+![Dashboard](docs/screenshots/dashboard.png)
+*Aggregated stats: total tasks, breakdown by status & priority, per-user distribution, overdue count — all from a single `/api/dashboard` query.*
 
-### Technical Highlights
-- RESTful API design with proper HTTP status codes
-- Prisma ORM with cascade deletes for data integrity
-- Request validation via `express-validator`
-- Axios interceptors for auth header injection and 401 auto-logout
-- React Context API for global auth state
-- Protected routes with redirect logic
-- Responsive design with Tailwind CSS
-- Environment-based configuration for dev/prod parity
+### Project Management — Kanban Board
+![Project Management](docs/screenshots/project-management.png)
+*Three-column Kanban (To Do / In Progress / Done), priority badges (color-coded), assignee info, overdue detection, and role-gated controls.*
 
 ---
 
-## 🛠 Tech Stack
+## Live Demo — Try It Yourself
 
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | React 18, Vite, Tailwind CSS, React Router v6 |
-| **Backend** | Node.js, Express.js |
-| **Database** | PostgreSQL (via Supabase) |
-| **ORM** | Prisma |
-| **Auth** | JWT (jsonwebtoken) + bcryptjs |
-| **Validation** | express-validator |
-| **Deployment** | Railway (backend + static frontend) |
-| **DB Hosting** | Supabase (free tier) |
+**URL:** https://task-manager-production-0aaa.up.railway.app/login
+
+| Step | Action | What It Proves |
+|------|--------|---------------|
+| 1 | Register as `admin@demo.com` | JWT auth + bcrypt hashing |
+| 2 | Create a project "Alpha Sprint" | Creator auto-assigned Admin role |
+| 3 | Add `member@demo.com` as Member | Email-based member invite |
+| 4 | Create 3 tasks, assign one to member | Task creation (admin-only) |
+| 5 | Set one task's due date to yesterday | Overdue detection |
+| 6 | Log in as `member@demo.com` | **See only their assigned task (RBAC proof)** |
+| 7 | Member tries to create a task | Button hidden + API returns 403 |
+| 8 | Member updates their task status | Allowed — status-only update enforced by API |
+| 9 | Open Dashboard | Live stats with overdue count |
+| 10 | `GET /api/health` | `{ "status": "ok" }` — health check |
 
 ---
 
-## 📐 Architecture
+## Features
+
+### Authentication
+- JWT signup/login with 7-day token expiry
+- bcrypt password hashing (cost factor 10 — OWASP standard)
+- `GET /api/auth/me` for token validation on page load
+- Axios interceptor: injects Bearer token on every request, auto-redirects on 401
+- Login returns identical error for wrong email vs wrong password (prevents user enumeration)
+
+### Project Management
+- Create projects — creator automatically becomes Admin
+- Add team members by email with role selection (Admin / Member)
+- Remove members
+- View all project members with roles
+
+### Kanban Task Board
+- Three fixed columns: **To Do / In Progress / Done**
+- Priority levels: **High / Medium / Low** with color-coded badges
+- Due date support with **overdue detection** (red badge)
+- Inline status updates without page reload
+
+### Role-Based Access Control (RBAC)
+- **Enforced on the API, not just the UI** — calling restricted endpoints directly with `curl` still returns 403
+- Admin: full CRUD on tasks, members, and projects
+- Member: can only view their assigned tasks and update their own task status
+
+### Dashboard Analytics
+- Total tasks, breakdown by status and priority
+- Per-user task distribution
+- Overdue task count
+- All computed server-side in a single `/api/dashboard` endpoint
+
+### API Documentation
+- In-app interactive `/docs` page listing all endpoints with request/response formats
+
+### Health Check
+- `GET /api/health` — uptime monitoring endpoint
+
+---
+
+## Tech Stack
+
+| Layer | Technology | Why |
+|-------|-----------|-----|
+| **Backend** | Node.js + Express | Fast REST API development, vast ecosystem |
+| **ORM** | Prisma | Type-safe queries, auto migrations, cascade deletes |
+| **Database** | PostgreSQL (Supabase) | Relational model fits project/task/member relations |
+| **Auth** | JWT + bcryptjs | Stateless (no Redis needed), bcrypt is slow by design |
+| **Validation** | express-validator | Declarative, prevents XSS and bad data at the boundary |
+| **Frontend** | React 18 + Vite | Fast HMR, component model, modern JSX |
+| **Routing** | React Router v6 | Protected routes, nested layouts |
+| **State** | React Context API | Right-sized — no Redux overhead for this scope |
+| **Styling** | Tailwind CSS | No custom CSS files, responsive by default |
+| **HTTP Client** | Axios | Interceptors for auth injection + 401 handling |
+| **Deployment** | Railway | Git-push deploys, Node.js native, free tier |
+| **DB Hosting** | Supabase | Free PostgreSQL, Prisma-compatible, no credit card |
+
+---
+
+## Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│                  Railway                     │
-│  ┌──────────────────────────────────────┐   │
-│  │         Express.js Server            │   │
-│  │  ┌──────────┐  ┌──────────────────┐  │   │
-│  │  │  /api/*  │  │  Static React    │  │   │
-│  │  │  Routes  │  │  Build (/public) │  │   │
-│  │  └────┬─────┘  └──────────────────┘  │   │
-│  └───────┼──────────────────────────────┘   │
-└──────────┼──────────────────────────────────┘
-           │ Prisma ORM
-           ▼
-┌─────────────────┐
-│    Supabase     │
-│   PostgreSQL    │
-└─────────────────┘
+                ┌───────────────────────────────────────┐
+                │           Railway (Single Service)     │
+                │                                        │
+                │   ┌───────────────────────────────┐   │
+                │   │        Express.js App          │   │
+                │   │                                │   │
+                │   │  ┌─────────┐  ┌─────────────┐  │   │
+                │   │  │ /api/*  │  │ Static React│  │   │
+                │   │  │ Routes  │  │ Build (SPA) │  │   │
+                │   │  └────┬────┘  └─────────────┘  │   │
+                │   └───────┼───────────────────────┘   │
+                └───────────┼───────────────────────────┘
+                            │ Prisma ORM
+                            ▼
+                ┌─────────────────────┐
+                │      Supabase       │
+                │    PostgreSQL DB    │
+                └─────────────────────┘
 ```
 
 **Request Flow:**
-1. Browser → Express `/api/*` → Route handler → Prisma → PostgreSQL
-2. Browser → Express `*` → Serve `frontend/dist/index.html` → React SPA
+- `Browser → /api/*` → Express route → auth middleware → RBAC check → Prisma → PostgreSQL → JSON
+- `Browser → any other path` → Express `*` catch-all → serve `frontend/dist/index.html` → React SPA
+
+**Why single service?** Two separate Railway services = two separate domains = CORS configuration. CORS bugs are the #1 cause of hackathon demo failures. Serving the React build from Express eliminates this entirely: one URL, one SSL cert, zero CORS.
 
 ---
 
-## 🗃 Database Schema
+## Database Schema
 
 ```
-User ──< ProjectMember >── Project
-                               │
-                               └──< Task >── User (assignedTo)
+User ──────< ProjectMember >────── Project
+                                       │
+                                       └──────< Task >── User (assignedTo)
 ```
 
-| Table | Key Fields |
-|-------|-----------|
-| `User` | id, name, email, password (hashed) |
-| `Project` | id, name, description, createdById |
-| `ProjectMember` | projectId, userId, role (admin\|member) |
-| `Task` | id, title, description, dueDate, priority, status, projectId, assignedToId |
+```prisma
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String   // bcrypt hash — never plaintext
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdById String   // FK → User
+}
+
+model ProjectMember {           // Junction table — holds role PER project
+  projectId String              // FK → Project (onDelete: Cascade)
+  userId    String              // FK → User    (onDelete: Cascade)
+  role      String @default("member")  // "admin" | "member"
+  @@unique([projectId, userId])
+}
+
+model Task {
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  dueDate      DateTime?
+  priority     String    @default("medium")  // low | medium | high
+  status       String    @default("todo")    // todo | inprogress | done
+  projectId    String    // FK → Project (onDelete: Cascade)
+  assignedToId String?   // FK → User (nullable)
+  createdById  String    // FK → User
+}
+```
+
+**Key design decision — Why `ProjectMember` junction table instead of a role column on User?**
+A user can be Admin on Project A and Member on Project B. A global role column can't express this. The junction table holds role *per (project, user)* pair — the correct relational model, and exactly how Jira, Linear, and Notion model it.
 
 ---
 
-## 🚀 Local Setup
+## RBAC — Enforced Server-Side
+
+> Hiding buttons in React is not security. Every restricted action verifies the caller's role via a Prisma query before executing.
+
+| Action | Admin | Member |
+|--------|:-----:|:------:|
+| Create / delete project | ✅ | ❌ |
+| Add / remove members | ✅ | ❌ |
+| Create / delete tasks | ✅ | ❌ |
+| Update any task field | ✅ | ❌ |
+| Update own task **status only** | ✅ | ✅ |
+| View **all** project tasks | ✅ | ❌ |
+| View **own assigned** tasks | ✅ | ✅ |
+| View dashboard | ✅ | ✅ |
+
+**How it's enforced in code:**
+
+```js
+// Task listing — server-side filter, not UI filter
+const where = { projectId };
+if (membership.role === 'member') {
+  where.assignedToId = req.userId;  // Members only see their tasks
+}
+
+// Task update — field-level restriction by role
+const updateData = isAdmin
+  ? { title, description, dueDate, priority, status, assignedToId }
+  : { status };  // Members can ONLY change status
+```
+
+---
+
+## API Reference
+
+**Base URL:** `https://task-manager-production-0aaa.up.railway.app/api`
+**Auth:** `Authorization: Bearer <token>`
+
+### Authentication
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| `POST` | `/auth/signup` | ❌ | Register — returns JWT + user |
+| `POST` | `/auth/login` | ❌ | Login — returns JWT + user |
+| `GET` | `/auth/me` | ✅ | Current user from token |
+
+### Projects
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| `GET` | `/projects` | ✅ | List user's projects |
+| `POST` | `/projects` | ✅ | Create project (creator → Admin) |
+| `GET` | `/projects/:id` | ✅ Member+ | Project + tasks + members |
+| `POST` | `/projects/:id/members` | ✅ Admin | Add member by email |
+| `DELETE` | `/projects/:id/members/:userId` | ✅ Admin | Remove member |
+
+### Tasks
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| `GET` | `/tasks?projectId=` | ✅ Member+ | Tasks (role-filtered) |
+| `POST` | `/tasks` | ✅ Admin | Create task |
+| `PUT` | `/tasks/:id` | ✅ | Update (field-restricted by role) |
+| `DELETE` | `/tasks/:id` | ✅ Admin | Delete task |
+
+### Dashboard & Health
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| `GET` | `/dashboard` | ✅ | Aggregated stats |
+| `GET` | `/health` | ❌ | `{ "status": "ok" }` |
+
+---
+
+## Local Setup
 
 ### Prerequisites
 - Node.js v18+
-- PostgreSQL database (or a free [Supabase](https://supabase.com) project)
+- PostgreSQL database — free [Supabase](https://supabase.com) project works perfectly
 
-### 1. Clone the repository
+### 1. Clone
 ```bash
 git clone https://github.com/yourusername/taskflow.git
 cd taskflow
@@ -126,11 +281,10 @@ cd taskflow
 
 ### 2. Install dependencies
 ```bash
-# Install both backend and frontend dependencies
 npm run install:all
 ```
 
-### 3. Configure environment variables
+### 3. Configure environment
 ```bash
 cp backend/.env.example backend/.env
 ```
@@ -144,9 +298,9 @@ NODE_ENV=development
 FRONTEND_URL="http://localhost:5173"
 ```
 
-> **Supabase users:** Go to Project Settings → Database → URI and copy the connection string.
+**Supabase:** Settings → Database → Connection string → URI
 
-### 4. Run database migrations
+### 4. Run migrations
 ```bash
 cd backend
 npx prisma migrate dev --name init
@@ -154,9 +308,7 @@ npx prisma generate
 cd ..
 ```
 
-### 5. Start development servers
-
-In two separate terminals:
+### 5. Start dev servers
 ```bash
 # Terminal 1 — Backend (port 3001)
 npm run dev:backend
@@ -165,166 +317,134 @@ npm run dev:backend
 npm run dev:frontend
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
+Open **http://localhost:5173**
 
 ---
 
-## 📦 Production Build
+## Railway Deployment
 
-```bash
-# Build frontend into backend/public
-npm run build
-
-# Start the server (serves both API and frontend)
-NODE_ENV=production npm start
-```
-
----
-
-## 🚂 Railway Deployment (Step-by-Step)
-
-### 1. Set up Supabase
-1. Go to [supabase.com](https://supabase.com) → New Project
-2. Navigate to **Settings → Database → Connection string → URI**
-3. Copy the connection string (replace `[YOUR-PASSWORD]` with your DB password)
+### 1. Supabase database
+1. [supabase.com](https://supabase.com) → New Project
+2. Settings → Database → Connection string → URI → copy
 
 ### 2. Push to GitHub
 ```bash
-git init
-git add .
-git commit -m "Initial commit"
+git add . && git commit -m "Initial commit"
 git remote add origin https://github.com/yourusername/taskflow.git
 git push -u origin main
 ```
 
-### 3. Deploy on Railway
-1. Go to [railway.app](https://railway.app) → **New Project → Deploy from GitHub Repo**
-2. Select your `taskflow` repository
-3. Railway auto-detects `railway.json` — no manual config needed
-4. Go to **Variables** tab and add:
+### 3. Railway setup
+1. [railway.app](https://railway.app) → New Project → Deploy from GitHub
+2. Select your repo — `railway.json` auto-detected
+3. Add environment variables:
 
 | Variable | Value |
 |----------|-------|
-| `DATABASE_URL` | Your Supabase PostgreSQL URI |
-| `JWT_SECRET` | A strong random string (32+ chars) |
+| `DATABASE_URL` | Supabase PostgreSQL URI |
+| `JWT_SECRET` | 32+ char random string |
 | `NODE_ENV` | `production` |
-| `PORT` | `3001` (or leave blank; Railway sets this) |
 
-5. Click **Deploy** — Railway builds frontend, installs backend deps, runs Prisma migrate, and starts the server
-6. Go to **Settings → Networking → Generate Domain** to get your public URL
-
----
-
-## 🔌 API Reference
-
-Visit the live `/docs` page in the app for the full interactive API reference.
-
-### Quick Reference
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/auth/signup` | ❌ | Register new user |
-| `POST` | `/api/auth/login` | ❌ | Login and get JWT |
-| `GET` | `/api/auth/me` | ✅ | Get current user |
-| `GET` | `/api/projects` | ✅ | List user's projects |
-| `POST` | `/api/projects` | ✅ | Create project |
-| `GET` | `/api/projects/:id` | ✅ | Project details + tasks + members |
-| `POST` | `/api/projects/:id/members` | ✅ Admin | Add member by email |
-| `DELETE` | `/api/projects/:id/members/:userId` | ✅ Admin | Remove member |
-| `GET` | `/api/tasks?projectId=...` | ✅ | List tasks (role-filtered) |
-| `POST` | `/api/tasks` | ✅ Admin | Create task |
-| `PUT` | `/api/tasks/:id` | ✅ | Update task (role-restricted) |
-| `DELETE` | `/api/tasks/:id` | ✅ Admin | Delete task |
-| `GET` | `/api/dashboard` | ✅ | Aggregated stats |
-| `GET` | `/api/health` | ❌ | Health check |
+4. Settings → Networking → Generate Domain
+5. Verify: `GET https://your-app.railway.app/api/health`
 
 ---
 
-## 🔐 Role Permissions
-
-| Action | Admin | Member |
-|--------|-------|--------|
-| Create / delete project | ✅ | ❌ |
-| Add / remove members | ✅ | ❌ |
-| Create / delete tasks | ✅ | ❌ |
-| Edit all task fields | ✅ | ❌ |
-| Update own task status | ✅ | ✅ |
-| View all project tasks | ✅ | ❌ |
-| View own assigned tasks | ✅ | ✅ |
-| View dashboard | ✅ | ✅ |
-
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 taskflow/
 ├── backend/
 │   ├── prisma/
-│   │   └── schema.prisma          # Database models & relations
+│   │   └── schema.prisma          # 4 models + relations + cascade rules
 │   ├── src/
 │   │   ├── middleware/
-│   │   │   └── auth.js            # JWT verification middleware
+│   │   │   └── auth.js            # JWT verify — used on all protected routes
 │   │   ├── routes/
-│   │   │   ├── auth.js            # /api/auth/*
-│   │   │   ├── projects.js        # /api/projects/*
-│   │   │   ├── tasks.js           # /api/tasks/*
-│   │   │   └── dashboard.js       # /api/dashboard
-│   │   └── server.js              # Express app entry point
+│   │   │   ├── auth.js            # signup, login, /me
+│   │   │   ├── projects.js        # CRUD + member management
+│   │   │   ├── tasks.js           # CRUD + RBAC field restrictions
+│   │   │   └── dashboard.js       # Aggregated stats
+│   │   └── server.js              # Express app + static file serving
 │   ├── .env.example
 │   └── package.json
 ├── frontend/
 │   ├── src/
-│   │   ├── api/axios.js           # Axios instance + interceptors
+│   │   ├── api/axios.js           # Axios instance + auth interceptor
 │   │   ├── context/AuthContext.jsx # Global auth state
 │   │   ├── components/
-│   │   │   ├── Layout.jsx         # Sidebar + navigation shell
-│   │   │   ├── TaskCard.jsx       # Task card with inline status update
+│   │   │   ├── Layout.jsx
+│   │   │   ├── TaskCard.jsx       # Inline status update
 │   │   │   ├── CreateProjectModal.jsx
 │   │   │   ├── CreateTaskModal.jsx
 │   │   │   └── AddMemberModal.jsx
-│   │   ├── pages/
-│   │   │   ├── Login.jsx
-│   │   │   ├── Register.jsx
-│   │   │   ├── Dashboard.jsx      # Stats & charts
-│   │   │   ├── Projects.jsx       # Project grid
-│   │   │   ├── ProjectDetail.jsx  # Kanban board
-│   │   │   └── Docs.jsx           # Interactive API reference
-│   │   ├── App.jsx                # Route definitions
-│   │   └── main.jsx
+│   │   └── pages/
+│   │       ├── Dashboard.jsx      # Stats + charts
+│   │       ├── ProjectDetail.jsx  # Kanban board
+│   │       └── Docs.jsx           # Interactive API reference
 │   └── vite.config.js
-├── railway.json                   # Railway deployment config
-├── package.json                   # Root scripts
-└── README.md
+├── docs/screenshots/
+│   ├── dashboard.png
+│   └── project-management.png
+├── railway.json
+├── package.json
+├── README.md                      # This file (renders with images on GitHub)
+└── README.txt                     # Plain-text version for submission portals
 ```
 
 ---
 
-## 🧪 Testing the Application
+## Security
 
-### Walkthrough Checklist
-- [ ] Register two user accounts (e.g., admin@test.com and member@test.com)
-- [ ] Log in as admin → Create a project
-- [ ] Add member@test.com as a Member to the project
-- [ ] Create 3 tasks with different priorities, assign one to the member
-- [ ] Log in as member → Verify they only see their assigned task
-- [ ] Update task status as member → Verify it updates on the board
-- [ ] Log back in as admin → Verify the dashboard shows correct stats
-- [ ] Check `/api/health` returns `{ "status": "ok" }`
-- [ ] Visit `/docs` for the interactive API reference
-
----
-
-## 🤝 Contributing
-
-Pull requests are welcome. For major changes, please open an issue first.
+| Concern | How It's Handled |
+|---------|-----------------|
+| Password storage | bcrypt with cost factor 10 — never stored/logged as plaintext |
+| JWT secret | Environment variable — never hardcoded |
+| User enumeration | Login returns identical error for wrong email vs wrong password |
+| Input validation | express-validator on all mutation endpoints |
+| SQL injection | Prisma ORM — no raw SQL anywhere |
+| RBAC bypass | All permission checks are server-side database queries |
+| Password in responses | Explicitly excluded from all Prisma `select` queries |
+| CORS | Restricted to `FRONTEND_URL` in dev; same-origin in production |
 
 ---
 
-## 📄 License
+## Testing Checklist
 
-MIT — see [LICENSE](LICENSE) for details.
+- [ ] Register two accounts (admin + member)
+- [ ] Log in as admin → create project → admin auto-assigned
+- [ ] Add member by email → member gets access
+- [ ] Create 3 tasks with different priorities → color badges visible
+- [ ] Set one task due date to yesterday → red overdue badge appears
+- [ ] Log in as member → **only assigned task visible** (RBAC proof)
+- [ ] As member: try to create a task → 403 from API
+- [ ] As member: update own task status → succeeds
+- [ ] Dashboard shows correct aggregated stats
+- [ ] `GET /api/health` → `{ "status": "ok" }`
+- [ ] Visit `/docs` → all endpoints listed with details
 
 ---
 
-<p align="center">Built with ❤️ using React, Express, Prisma, and PostgreSQL</p>
+## Scripts
+
+```bash
+npm run install:all    # Install backend + frontend dependencies
+npm run build          # Build React into backend/public
+npm start              # Start production server
+npm run dev:backend    # Start backend dev server (port 3001)
+npm run dev:frontend   # Start Vite dev server (port 5173)
+```
+
+---
+
+## License
+
+MIT — free to use, modify, and distribute.
+
+---
+
+<p align="center">
+  Built with Node.js · Express · Prisma · PostgreSQL · React · Vite · Tailwind CSS
+  <br/>
+  Deployed on Railway · Database on Supabase
+</p>
