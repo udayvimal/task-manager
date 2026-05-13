@@ -1,0 +1,125 @@
+APPROACH & THOUGHT PROCESS — TaskFlow
+======================================
+Author: [Your Name]
+Date: May 2026
+
+──────────────────────────────────────────────
+WHY I BUILT IT THE WAY I DID
+──────────────────────────────────────────────
+
+When I first read the problem statement, the two things that immediately stood
+out were: (1) role-based access control isn't just a UI concern — it needs to
+be enforced on the backend too, and (2) the assignment says "deployment is
+mandatory", which means the architecture has to actually work in production, not
+just on localhost.
+
+So I made two foundational decisions early on:
+
+  1. Single-service deployment — instead of deploying frontend and backend as
+     two separate Railway services (which complicates CORS, costs more, and adds
+     ops overhead), I built the Express server to serve the React build as static
+     files in production. One URL, one service, zero CORS issues.
+
+  2. Enforce RBAC on the API, not just the UI — hiding buttons in React is not
+     security. Every sensitive route (create task, add member, delete project)
+     checks the user's role directly in the database before doing anything. A
+     member can't create tasks even if they call the API directly with curl.
+
+──────────────────────────────────────────────
+DATABASE DESIGN DECISIONS
+──────────────────────────────────────────────
+
+The biggest design question was: how do I model roles? I could have added a
+`role` column to the User table, but that's global. A person can be an admin
+on Project A and just a member on Project B. So I created a junction table —
+`ProjectMember` — that holds both the relationship AND the role. This is the
+correct relational modeling.
+
+I used Prisma as the ORM because it gives me:
+  - Type-safe queries (no raw SQL typos)
+  - Auto-generated migrations
+  - Easy cascade deletes (delete a project → all its tasks + memberships vanish)
+
+For the database itself, Supabase is the obvious choice — free hosted
+PostgreSQL, no credit card required, and works out-of-the-box with Prisma.
+
+──────────────────────────────────────────────
+AUTHENTICATION
+──────────────────────────────────────────────
+
+I went with JWT over sessions because this is a REST API — sessions need
+server-side storage or Redis, which adds infrastructure complexity. JWTs are
+stateless: the server just validates the signature, and the client stores the
+token in localStorage.
+
+Passwords are hashed with bcrypt (cost factor 10), which is the industry
+standard. I never store or log plaintext passwords anywhere.
+
+The token has a 7-day expiry — long enough to not be annoying, short enough to
+limit damage if a token leaks. In a real production system, I'd add refresh
+tokens and token rotation, but for this scope it's the right tradeoff.
+
+──────────────────────────────────────────────
+FRONTEND ARCHITECTURE
+──────────────────────────────────────────────
+
+I used React Context for auth state — it's simpler than Redux for this use
+case. The AuthContext also handles the initial token validation on page load
+(calling /api/auth/me), so if a token is expired the user gets redirected
+to login immediately.
+
+The Axios interceptor is a key piece: it automatically injects the Bearer token
+on every request, and if it gets a 401 back, it clears the token and redirects
+to /login. This means auth errors are handled in one place, not scattered
+across every page.
+
+The kanban board (ProjectDetail.jsx) was the most complex UI component. I
+chose three fixed status columns over a drag-and-drop board because:
+  - No extra library dependency (no react-beautiful-dnd)
+  - The status dropdown on each card is actually faster to use on mobile
+  - Less code to debug and explain in a demo
+
+──────────────────────────────────────────────
+WHAT I'D ADD WITH MORE TIME
+──────────────────────────────────────────────
+
+  1. Real-time updates with WebSockets (Socket.io) — so when one team member
+     updates a task, everyone on the board sees it instantly
+  2. Email notifications for task assignments
+  3. File attachments on tasks
+  4. Pagination for large task lists
+  5. Dark mode
+  6. Full test suite (Jest + Supertest for API, Vitest + RTL for components)
+  7. Refresh token rotation for better security
+  8. Admin can change member roles after adding them
+
+──────────────────────────────────────────────
+CHALLENGES & HOW I SOLVED THEM
+──────────────────────────────────────────────
+
+Challenge: Members should only see their assigned tasks, not all project tasks.
+Solution: The GET /api/tasks endpoint checks the caller's role. If they're a
+member, it adds `where: { assignedToId: req.userId }` to the Prisma query.
+Admins get all tasks with no filter. This is enforced server-side.
+
+Challenge: Single-service deployment for Railway.
+Solution: Vite's `outDir` points to `backend/public`. In production mode,
+Express serves that directory as static files and falls back to index.html for
+client-side routing. During development, Vite's dev server proxies /api calls
+to Express on port 3001.
+
+Challenge: Cascade deletes.
+Solution: Prisma's `onDelete: Cascade` on all foreign keys pointing to Project.
+Deleting a project automatically removes all its tasks and memberships.
+
+──────────────────────────────────────────────
+TECH CHOICES SUMMARY
+──────────────────────────────────────────────
+
+  Node.js + Express  →  Fast to write, easy to understand, huge ecosystem
+  Prisma             →  Type safety + migrations + clean syntax
+  PostgreSQL/Supabase→  Relational data fits the project/task/member model
+  React + Vite       →  Fast HMR, modern tooling, component model fits UI
+  Tailwind CSS       →  No custom CSS files, consistent design system
+  JWT                →  Stateless auth, no server-side session store needed
+  Railway            →  Git-push deployment, free tier, supports Node.js natively
