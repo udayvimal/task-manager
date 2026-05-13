@@ -20,7 +20,7 @@ app.use('/api/dashboard', require('./routes/dashboard'));
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
 // Serve React build if frontend has been built
-const publicDir = path.join(__dirname, '../public');
+const publicDir = path.join(__dirname, '../../frontend/dist');
 if (fs.existsSync(path.join(publicDir, 'index.html'))) {
   app.use(express.static(publicDir));
   app.get('*', (_req, res) => {
