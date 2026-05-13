@@ -1,4 +1,4 @@
-# TaskFlow — Production-Grade Collaborative Task Management Platform
+# Task Manager — Production-Grade Collaborative Task Management Platform
 
 > Full-Stack · Node.js + React + PostgreSQL · JWT Auth · Role-Based Access Control · Live Deployed on Railway
 
@@ -13,7 +13,7 @@
 
 ## What Is This?
 
-TaskFlow is a **production-ready, multi-user team task management platform** built from scratch — no boilerplate generators, no starter kits. It lets teams create projects, assign tasks, manage members, and track progress through a Kanban board and analytics dashboard.
+Task Manager is a **production-ready, multi-user team task management platform** built from scratch — no boilerplate generators, no starter kits. It lets teams create projects, assign tasks, manage members, and track progress through a Kanban board and analytics dashboard.
 
 **What makes it production-grade:**
 - Role-based access control enforced **on the server** (not just hidden in the UI)
@@ -275,8 +275,8 @@ const updateData = isAdmin
 
 ### 1. Clone
 ```bash
-git clone https://github.com/yourusername/taskflow.git
-cd taskflow
+git clone https://github.com/udayvimal/task-manager.git
+cd task-manager
 ```
 
 ### 2. Install dependencies
@@ -330,7 +330,7 @@ Open **http://localhost:5173**
 ### 2. Push to GitHub
 ```bash
 git add . && git commit -m "Initial commit"
-git remote add origin https://github.com/yourusername/taskflow.git
+git remote add origin https://github.com/udayvimal/task-manager.git
 git push -u origin main
 ```
 
@@ -353,7 +353,7 @@ git push -u origin main
 ## Project Structure
 
 ```
-taskflow/
+task-manager/
 ├── backend/
 │   ├── prisma/
 │   │   └── schema.prisma          # 4 models + relations + cascade rules

@@ -1,18 +1,18 @@
 ================================================================================
-  TASKFLOW — Production-Grade Collaborative Task Management Platform
+  TASK MANAGER — Production-Grade Collaborative Task Management Platform
 ================================================================================
 
   Full-Stack | Node.js + React + PostgreSQL | JWT Auth | RBAC | Live on Railway
-  Author  : Ayush
+  Author  : Uday Vimal
   Date    : May 2026
   Live URL: https://task-manager-production-0aaa.up.railway.app/login
-  GitHub  : https://github.com/yourusername/taskflow
+  GitHub  : https://github.com/udayvimal/task-manager
 
 ================================================================================
   QUICK PITCH  (read this first)
 ================================================================================
 
-TaskFlow is a production-ready, multi-user team task management application
+Task Manager is a production-ready, multi-user team task management application
 built entirely from scratch in a single sprint. It supports:
 
   - Secure JWT authentication with bcrypt-hashed passwords
@@ -417,8 +417,8 @@ Steps to evaluate the full feature set on the live deployment:
       Option B: Local PostgreSQL installation
 
   STEP 1 — Clone the repository
-    git clone https://github.com/yourusername/taskflow.git
-    cd taskflow
+    git clone https://github.com/udayvimal/task-manager.git
+    cd task-manager
 
   STEP 2 — Install all dependencies (backend + frontend)
     npm run install:all
@@ -480,12 +480,12 @@ Steps to evaluate the full feature set on the live deployment:
     git init
     git add .
     git commit -m "Initial commit"
-    git remote add origin https://github.com/yourusername/taskflow.git
+    git remote add origin https://github.com/udayvimal/task-manager.git
     git push -u origin main
 
   STEP 3 — Create Railway project
     1. railway.app → New Project → Deploy from GitHub Repo
-    2. Select your taskflow repository
+    2. Select your task-manager repository
     3. Railway detects railway.json automatically — no manual config needed
 
   STEP 4 — Set environment variables in Railway
@@ -514,7 +514,7 @@ Steps to evaluate the full feature set on the live deployment:
   PROJECT STRUCTURE
 ================================================================================
 
-  taskflow/
+  task-manager/
   ├── backend/
   │   ├── prisma/
   │   │   └── schema.prisma          ← All 4 database models + relations
@@ -736,7 +736,7 @@ Steps to evaluate the full feature set on the live deployment:
   SCRIPTS REFERENCE
 ================================================================================
 
-  From the project root (taskflow/):
+  From the project root (task-manager/):
 
     npm run install:all      Install backend + frontend dependencies
     npm run build            Build React frontend into backend/public
